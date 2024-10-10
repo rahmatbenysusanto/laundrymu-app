@@ -29,8 +29,6 @@ class PelangganController extends Controller
             'no_hp'     => $request->post('noHp'),
         ]);
 
-        Log::info(json_encode($request->all()));
-
         if ($hit->status) {
             return response()->json([
                 'status'    => true,

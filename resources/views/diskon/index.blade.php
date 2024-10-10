@@ -16,7 +16,10 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Daftar Diskon</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">Daftar Diskon</h4>
+                        <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tambahDiskon">Tambah Diskon</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -36,12 +39,12 @@
                                         <td>{{ $diskon->firstItem() + $index }}</td>
                                         <td>{{ $pel->nama }}</td>
                                         <td>{{ $pel->type }}</td>
-                                        <td>Rp {{ number_format($pel->nominal) }}</td>
+                                        <td>{{ $pel->type == 'nominal' ? 'Rp '.number_format($pel->nominal) : $pel->nominal.'%' }}</td>
                                         <td>
-                                            <a class="btn btn-secondary btn-sm">
+                                            <a class="btn btn-secondary btn-sm" onclick="editDiskon('{{ $pel->id }}', '{{ $pel->nama }}', '{{ $pel->type }}', '{{ $pel->nominal }}')">
                                                 <i class="fa-light fa-pen-to-square"></i>
                                             </a>
-                                            <a class="btn btn-danger btn-sm ms-2">
+                                            <a class="btn btn-danger btn-sm ms-2" onclick="hapusDiskon('{{ $pel->id }}')">
                                                 <i class="fa-light fa-trash"></i>
                                             </a>
                                         </td>
@@ -87,4 +90,128 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="tambahDiskon" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputModalLabel">Tambah Diskon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('tambahDiskon') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama diskon" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipe" class="form-label">Tipe</label>
+                            <select class="form-select" name="tipe" id="tipe">
+                                <option value="nominal">Nominal</option>
+                                <option value="presentase">Presentase</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nominal" class="form-label">Nominal</label>
+                            <input type="number" class="form-control" id="nominal" name="nominal" placeholder="Masukkan nominal" required>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary ms-2">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editDiskon" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputModalLabel">Tambah Diskon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="formEditDiskon">
+
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('js')
+    <script>
+        function editDiskon(id, nama, type, harga) {
+            document.getElementById('formEditDiskon').innerHTML = `
+                <form action="{{ route('updateDiskon') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="id" value="${id}">
+                    <div class="mb-3">
+                        <label for="nama" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama diskon" value="${nama}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipe" class="form-label">Tipe</label>
+                        <select class="form-select" name="tipe" id="tipe">
+                            <option ${type === 'nominal' ? 'selected' : ''} value="nominal">Nominal</option>
+                            <option ${type === 'presentase' ? 'selected' : ''} value="presentase">Presentase</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nominal" class="form-label">Nominal</label>
+                        <input type="number" class="form-control" id="nominal" name="nominal" placeholder="Masukkan nominal" value="${harga}" required>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary ms-2">Simpan</button>
+                    </div>
+                </form>
+            `;
+
+            $('#editDiskon').modal('show');
+        }
+
+        function hapusDiskon(id) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Apakah Kamu Yakin?',
+                text: 'Untuk Menghapus Diskon ini?',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Yakin",
+                cancelButtonText: "Tidak",
+            }).then((r) => {
+                if (r.value) {
+                    $.ajax({
+                        url: '{{ route('hapusDiskon') }}',
+                        method: 'GET',
+                        data: {
+                            id: id
+                        },
+                        success: (res) => {
+                            if (res.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: 'Hapus Diskon Berhasil!',
+                                    showConfirmButton: true
+                                }).then((r) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: 'Hapus Diskon Gagal!',
+                                    showConfirmButton: true
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 @endsection
