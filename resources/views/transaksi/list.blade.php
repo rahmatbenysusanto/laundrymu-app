@@ -45,19 +45,19 @@
                                     <td class="text-center">
                                         @switch($tra->status)
                                             @case('baru')
-                                                <span class="badge bg-success">Aktif</span>
+                                                <span class="badge bg-success">Baru</span>
                                                 @break
                                             @case('diproses')
                                                 <span class="badge bg-primary">Diproses</span>
                                                 @break
                                             @case('selesai')
-                                                <span class="badge bg-info">Selesai</span>
+                                                <span class="badge bg-warning">Menunggu Pengambilan</span>
                                                 @break
                                             @case('diambil')
-                                                <span class="badge bg-warning">Diambil</span>
+                                                <span class="badge bg-secondary">Selesai</span>
                                                 @break
                                             @case('close')
-                                                <span class="badge bg-secondary">Close</span>
+                                                <span class="badge bg-secondary">Selesai</span>
                                                 @break
                                             @case('batal')
                                                 <span class="badge bg-danger">Batal</span>
@@ -75,12 +75,17 @@
                                     </td>
                                     <td>{{ $tra->catatan }}</td>
                                     <td>
-                                        <a class="btn btn-secondary btn-sm">
-                                            <i class="fa-light fa-pen-to-square"></i>
+                                        <a href="{{ route('detailTransaksi', ['order_number' => $tra->order_number]) }}" class="btn btn-primary btn-sm">
+                                            <i class="fa-light fa-eye"></i>
                                         </a>
-                                        <a class="btn btn-danger btn-sm ms-2">
-                                            <i class="fa-light fa-trash"></i>
-                                        </a>
+                                        @if($tra->status != 'close' && $tra->status != 'batal')
+                                            <a class="btn btn-secondary btn-sm ms-2">
+                                                <i class="fa-light fa-washing-machine" onclick="prosesTransaksi('{{ $tra->id }}', '{{ $tra->status }}')"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-sm ms-2" onclick="cancelTransaksi('{{ $tra->id }}')">
+                                                <i class="fa-light fa-trash"></i>
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -124,4 +129,93 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('js')
+    <script>
+        function cancelTransaksi(id) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Apakah Kamu Yakin?',
+                text: 'Untuk Membatalkan Transaksi ini?',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Yakin",
+                cancelButtonText: "Tidak",
+            }).then((e) => {
+                if (e.value) {
+                    $.ajax({
+                        url: '{{ route('cancelTransaksi') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id
+                        },
+                        success: (res) => {
+                            if (res.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: 'Cancel Transaksi Berhasil!',
+                                    showConfirmButton: true
+                                }).then((r) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: 'Cancel Transaksi Gagal!',
+                                    showConfirmButton: true
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function prosesTransaksi(id, status) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Apakah Kamu Yakin?',
+                text: 'Untuk Memproses Transaksi ini?',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Yakin",
+                cancelButtonText: "Tidak",
+            }).then((e) => {
+                if (e.value) {
+                    $.ajax({
+                        url: '{{ route('prosesTransaksi') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id,
+                            status: status
+                        },
+                        success: (res) => {
+                            if (res.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: 'Memproses Transaksi Berhasil!',
+                                    showConfirmButton: true
+                                }).then((r) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: 'Memproses Transaksi Gagal!',
+                                    showConfirmButton: true
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 @endsection

@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Outlet')
 
 @section('content')
     <div class="page-header">
@@ -16,7 +17,10 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Daftar Outlet</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">Daftar Outlet</h4>
+                        <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tambahOutlet">Tambah Outlet</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -26,7 +30,7 @@
                                 <th>#</th>
                                 <th>Nama</th>
                                 <th>No HP</th>
-                                <th>Status</th>
+                                <th class="text-center">Status</th>
                                 <th>Expired</th>
                                 <th>Alamat</th>
                                 <th>Pilihan</th>
@@ -36,9 +40,12 @@
                             @foreach($outlet as $index => $out)
                                 <tr>
                                     <td>{{ $outlet->firstItem() + $index }}</td>
-                                    <td>{{ $out->nama }}</td>
-                                    <td>{{ $out->no_hp }}</td>
                                     <td>
+                                        {{ $out->nama }}
+                                        {!! Session::get('toko')->id == $out->id ? '<span class="badge bg-success">DiPakai</span>' : '' !!}
+                                    </td>
+                                    <td>{{ $out->no_hp }}</td>
+                                    <td class="text-center">
                                         @if($out->status == 'active')
                                             <span class="badge bg-success">Aktif</span>
                                         @else
@@ -48,18 +55,20 @@
                                     <td>{{ \Carbon\Carbon::parse($out->expired)->translatedFormat('d F Y') }}</td>
                                     <td>{{ $out->alamat }}</td>
                                     <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Pilihan
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Lihat</a></li>
-                                                <li><a class="dropdown-item" href="#">Perpanjang Lisensi</a></li>
-                                                @if($out->id != Session::get('toko')->id)
-                                                    <li><a class="dropdown-item" href="#">Pindah Outlet</a></li>
-                                                @endif
-                                            </ul>
-                                        </div>
+                                        @if($out->id == Session::get('toko')->id)
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Pilihan
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#">Lihat</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('editOutlet', ['id' => base64_encode($out->id)]) }}">Edit</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('perpanjangLisensi') }}">Perpanjang Lisensi</a></li>
+                                                </ul>
+                                            </div>
+                                        @else
+                                            <a class="btn btn-dark btn-sm text-white" onclick="changeOutlet('{{ $out->id }}', '{{ $out->nama }}')">Pindah Outlet</a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -103,4 +112,52 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('js')
+    <script>
+        function changeOutlet(id, nama) {
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: 'Mau berpindah ke outlet '+nama,
+                icon: 'info',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Yakin",
+                cancelButtonText: "Tidak",
+            }).then((e) => {
+                if (e.value) {
+                    $.ajax({
+                        url: '{{ route('changeOutlet') }}',
+                        method: 'GET',
+                        data: {
+                            id: id
+                        },
+                        success: (res) => {
+                            if (res.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: 'Pindah ke outlet '+ nama +' Berhasil!',
+                                    showConfirmButton: true
+                                }).then((r) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: 'Pindah ke outlet '+ nama +' Gagal!',
+                                    showConfirmButton: true
+                                });
+                            }
+                        },
+                        error: (err) => {
+
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 @endsection

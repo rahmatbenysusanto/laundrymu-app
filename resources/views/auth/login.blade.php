@@ -68,7 +68,7 @@
                                 <button class="btn btn-login" type="submit">Login</button>
                             </div>
                             <div class="signinform">
-                                <h4>Belum punya akun LaundryMu?<a href="" class="hover-a"> Buat Akun</a></h4>
+                                <h4>Belum punya akun LaundryMu?<a href="{{ route('register') }}" class="hover-a"> Buat Akun</a></h4>
                             </div>
                         </div>
                     </form>

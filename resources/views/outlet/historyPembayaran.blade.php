@@ -48,7 +48,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $pem->url_payment }}</td>
-                                    <td>{{ \Carbon\Carbon::parse(date('Y-m-d', strtotime($pem->created_at)))->translatedFormat('d F Y H:i') }}</td>
+                                    <td>{{ \Carbon\Carbon::createFromTimestamp($pem->created_at / 1000)->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('d F Y H:i') }}</td>
                                     <td>
                                         <a class="btn btn-secondary btn-sm">
                                             <i class="fa-light fa-pen-to-square"></i>

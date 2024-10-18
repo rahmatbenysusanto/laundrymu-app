@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'login')->name('login');
     Route::post('/login', 'loginPost')->name('loginPost');
+    Route::get('/register', 'register')->name('register');
+    Route::post('/register', 'registerPost')->name('registerPost');
+    Route::get('/verifikasi-otp', 'verifikasiOTP')->name('verifikasiOTP');
+    Route::post('/verifikasi-otp', 'verifikasiOTPPost')->name('verifikasiOTPPost');
 });
 
 Route::middleware([AuthMiddleware::class])->group(function () {
@@ -68,6 +72,10 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
     Route::prefix('outlet')->controller(OutletController::class)->group(function () {
         Route::get('/', 'index')->name('outlet');
+        Route::get('/outlet/edit/{id}', 'edit')->name('editOutlet');
+        Route::get('/change', 'changeOutlet')->name('changeOutlet');
+        Route::get('/perpanjang-lisensi', 'perpanjangLisensi')->name('perpanjangLisensi');
+        Route::post('/perpanjang-lisensi', 'perpanjangLisensiProcess')->name('perpanjangLisensiProcess');
         Route::get('/pembayaran-lisensi', 'historyPembayaran')->name('historyPembayaran');
     });
 
@@ -75,6 +83,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/', 'listTransaksi')->name('listTransaksi');
         Route::get('/tambah', 'createTransaksi')->name('createTransaksi');
         Route::post('/create', 'createTransaksiPost')->name('createTransaksiPost');
+        Route::post('/cancel', 'cancelTransaksi')->name('cancelTransaksi');
+        Route::post('/proses', 'prosesTransaksi')->name('prosesTransaksi');
+        Route::get('/detail/{order_number}', 'detailTransaksi')->name('detailTransaksi');
 
         // JSON Response
         Route::get('/get-layanan', 'getLayanan')->name('transaksi.getLayanan');
