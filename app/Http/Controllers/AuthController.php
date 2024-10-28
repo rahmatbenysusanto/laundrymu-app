@@ -15,47 +15,35 @@ class AuthController extends Controller
 
     public function loginPost(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $data = [
-            "no_hp" => $request->post("no_hp"),
-            "password" => $request->post("password"),
-        ];
+        $data["no_hp"] = $request->post("no_hp");
+        $data["password"] = $request->post("password");
 
         $hit = $this->POSTLOGIN("api/auth/login", $data);
+        if (isset($hit) && $hit->status) {
+            Session::put("nama", $hit->data->nama);
+            Session::put("role", $hit->data->role);
+            Session::put("token", $hit->data->access_token);
+            Session::put('user_id', $hit->data->user_id);
+            Session::put('no_hp', $hit->data->no_hp);
 
-        if (is_object($hit) && isset($hit->status)) {
-            if ($hit->status) {
-                Session::put("nama", $hit->data->nama);
-                Session::put("role", $hit->data->role);
-                Session::put("token", $hit->data->access_token);
-                Session::put("user_id", $hit->data->user_id);
-                Session::put("no_hp", $hit->data->no_hp);
-
-                if ($hit->data->role == "owner") {
-                    $toko = $this->GET('api/outlet/user', []);
-                    if (isset($toko->data[0])) {
-                        Session::put('toko', $toko->data[0]->outlet);
-                    }
-                    if ($hit->data->status != "active") {
-                        return redirect()->to(route('verifikasiOTP'));
-                    }
-                } else {
-                    $toko = $this->GET('api/toko/pegawai/' . $hit->data->id, []);
-                    if (isset($toko->data)) {
-                        Session::put('toko', $toko->data->toko);
-                    }
+            // Get Toko
+            if ($hit->data->role == "owner") {
+                $toko = $this->GET('api/outlet/user', []);
+                Session::put('toko', $toko->data[0]->outlet);
+                if ($hit->data->status != "active") {
+                    return redirect()->to(route('verifikasiOTP'));
                 }
-
-                return redirect()->action([DashboardController::class, 'index']);
             } else {
-                Session::flash("error", $hit->errors ?? "Login gagal, email atau password salah!");
-                return back();
+                $toko = $this->GET('api/toko/pegawai/'.$hit->data->id, []);
+                Session::put('toko', $toko->data->toko);
             }
+
+            return redirect()->action([DashboardController::class, 'index']);
         } else {
-            Session::flash("error", "Terjadi kesalahan saat memproses permintaan.");
+            Session::flash("error", "Login gagal, email atau password salah!");
             return back();
         }
     }
-
 
     public function register(): View
     {
