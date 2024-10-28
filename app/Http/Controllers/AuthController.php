@@ -19,6 +19,7 @@ class AuthController extends Controller
         $data["password"] = $request->post("password");
 
         $hit = $this->POSTLOGIN("api/auth/login", $data);
+        dd($hit);
         if (isset($hit) && $hit->status) {
             Session::put("nama", $hit->data->nama);
             Session::put("role", $hit->data->role);
