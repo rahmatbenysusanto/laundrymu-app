@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Dashboard')
 
 @section('content')
     <div class="row">
@@ -8,8 +9,8 @@
                     <span><img src="assets/img/icons/dash1.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>$<span class="counters" data-count="307144.00">$307,144.00</span></h5>
-                    <h6>Total Purchase Due</h6>
+                    <h5>Rp <span class="counters">{{ number_format($totalPendapatan) }}</span></h5>
+                    <h6>Total Pendapatan Hari Ini</h6>
                 </div>
             </div>
         </div>
@@ -19,8 +20,8 @@
                     <span><img src="assets/img/icons/dash2.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>$<span class="counters" data-count="4385.00">$4,385.00</span></h5>
-                    <h6>Total Sales Due</h6>
+                    <h5><span class="counters" data-count="{{ $jumlahTransaksi }}">{{ $jumlahTransaksi }}</span></h5>
+                    <h6>Jumlah Transaksi</h6>
                 </div>
             </div>
         </div>
@@ -30,8 +31,8 @@
                     <span><img src="assets/img/icons/dash3.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>$<span class="counters" data-count="385656.50">$385,656.50</span></h5>
-                    <h6>Total Sale Amount</h6>
+                    <h5><span class="counters" data-count="{{ $totalPelanggan }}">{{ number_format($totalPelanggan) }}</span></h5>
+                    <h6>Total Pelanggan</h6>
                 </div>
             </div>
         </div>
@@ -41,52 +42,52 @@
                     <span><img src="assets/img/icons/dash4.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>$<span class="counters" data-count="40000.00">$400.00</span></h5>
-                    <h6>Total Expense Amount</h6>
+                    <h5><span class="counters" data-count="{{ $pelangganBaru }}">{{ number_format($pelangganBaru) }}</span></h5>
+                    <h6>Pelanggan Baru Bulan Ini</h6>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-sm-6 col-12 d-flex">
             <div class="dash-count">
                 <div class="dash-counts">
-                    <h4>100</h4>
-                    <h5>Customers</h5>
+                    <h4>{{ $statusTransaksi->baru }}</h4>
+                    <h5>Laundry Baru</h5>
                 </div>
                 <div class="dash-imgs">
-                    <i data-feather="user"></i>
+                    <i class="fa-sharp fa-thin fa-shirt"></i>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-sm-6 col-12 d-flex">
             <div class="dash-count das1">
                 <div class="dash-counts">
-                    <h4>110</h4>
-                    <h5>Suppliers</h5>
+                    <h4>{{ $statusTransaksi->diproses }}</h4>
+                    <h5>Laundry Diproses</h5>
                 </div>
                 <div class="dash-imgs">
-                    <i data-feather="user-check"></i>
+                    <i class="fa-thin fa-washing-machine"></i>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-sm-6 col-12 d-flex">
             <div class="dash-count das2">
                 <div class="dash-counts">
-                    <h4>150</h4>
-                    <h5>Purchase Invoice</h5>
+                    <h4>{{ $statusTransaksi->selesai }}</h4>
+                    <h5>Menunggu Pengambilan</h5>
                 </div>
                 <div class="dash-imgs">
-                    <img src="assets/img/icons/file-text-icon-01.svg" class="img-fluid" alt="icon">
+                    <i class="fa-thin fa-person-carry-box"></i>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-sm-6 col-12 d-flex">
             <div class="dash-count das3">
                 <div class="dash-counts">
-                    <h4>170</h4>
-                    <h5>Sales Invoice</h5>
+                    <h4>{{ $statusTransaksi->close }}</h4>
+                    <h5>Laundry Diambil</h5>
                 </div>
                 <div class="dash-imgs">
-                    <i data-feather="file"></i>
+                    <i class="fa-light fa-badge-check"></i>
                 </div>
             </div>
         </div>

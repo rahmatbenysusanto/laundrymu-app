@@ -6,6 +6,7 @@ use App\Http\Controllers\DiskonController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\ParfumController;
+use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PembayaranController;
@@ -90,6 +91,11 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         // JSON Response
         Route::get('/get-layanan', 'getLayanan')->name('transaksi.getLayanan');
         Route::get('/get-pelanggan', 'getPelanggan')->name('transaksi.getPelanggan');
+    });
+
+    Route::prefix('pegawai')->controller(PegawaiController::class)->group(function () {
+        Route::get('/', 'index')->name('pegawai');
+        Route::post('/', 'tambahPegawai')->name('tambahPegawai');
     });
 });
 

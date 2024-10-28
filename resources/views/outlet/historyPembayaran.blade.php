@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Outlet')
 
 @section('content')
     <div class="page-header">

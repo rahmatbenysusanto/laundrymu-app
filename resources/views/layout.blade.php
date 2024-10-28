@@ -305,10 +305,10 @@
                     <li class="submenu-open">
                         <h6 class="submenu-hdr">Pegawai</h6>
                         <ul>
-                            <li>
-                                <a href="#">
+                            <li class="{{ $title == 'pegawai' ? 'active' : '' }}">
+                                <a href="{{ route('pegawai') }}">
                                     <i data-feather="users"></i>
-                                    <span>Daftar Pelanggan</span>
+                                    <span>Daftar Pegawai</span>
                                 </a>
                             </li>
                         </ul>

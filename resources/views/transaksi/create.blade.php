@@ -1,5 +1,5 @@
 @extends('layout')
-@section('title', 'Transaksi - LaundryMu')
+@section('title', 'Transaksi')
 
 @section('content')
     <div class="page-header">
